@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, ReactNode } from "react";
 import {
   formatAbilities,
   formatStats,
@@ -9,13 +9,54 @@ import {
 } from "../helpers/pokemon";
 import axios from "axios";
 
-const PokemonContext = createContext();
+interface Pokemon {
+  id: number;
+  name: string;
+  height: number;
+  weight: number;
+  stats: Record<string, number>;
+  types: string[];
+  abilities: string[];
+  description: string;
+  evolutions: string[];
+  image: string;
+}
 
-const PokemonProvider = ({ children }) => {
-  const [pokemonDetail, setPokemonDetail] = useState(null);
-  const [showDetailPokemon, setShowDetailPokemon] = useState(false);
+interface PokemonInfo {
+  species: {
+    url: string;
+  };
+  sprites: Record<string, string>;
+  height: number;
+  weight: number;
+  stats: { base_stat: number; stat: { name: string } }[];
+  types: { type: { name: string } }[];
+  abilities: { ability: { name: string } }[];
+}
 
-  const showPokemon = async (pokemonInfo) => {
+interface PokemonContextProps {
+  showDetailPokemon: boolean;
+  showPokemon: (pokemonInfo: PokemonInfo) => void;
+  closePokemonDetail: () => void;
+  pokemonDetail: Pokemon | null;
+}
+
+const PokemonContext = createContext<PokemonContextProps>({
+  showDetailPokemon: false,
+  showPokemon: () => {},
+  closePokemonDetail: () => {},
+  pokemonDetail: null,
+});
+
+interface PokemonProviderProps {
+  children: ReactNode;
+}
+
+const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
+  const [pokemonDetail, setPokemonDetail] = useState<Pokemon | null>(null);
+  const [showDetailPokemon, setShowDetailPokemon] = useState<boolean>(false);
+
+  const showPokemon = async (pokemonInfo: PokemonInfo) => {
     const { data: dataSpecies } = await axios.get(pokemonInfo.species.url);
     const { data: dataEvolution } = await axios.get(
       dataSpecies.evolution_chain.url

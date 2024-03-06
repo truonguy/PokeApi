@@ -1,14 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+interface IntersectionObserverOptions {
+  threshold?: number | number[];
+  root?: Element | null;
+  rootMargin?: string;
+  freezeOnceVisible?: boolean;
+}
 
 export function useIntersectionObserver(
-  elementRef,
-  { threshold = 0, root = null, rootMargin = "0%", freezeOnceVisible = false }
-) {
-  const [entry, setEntry] = useState();
+  elementRef: React.RefObject<Element>,
+  {
+    threshold = 0,
+    root = null,
+    rootMargin = "0%",
+    freezeOnceVisible = false,
+  }: IntersectionObserverOptions
+): IntersectionObserverEntry | undefined {
+  const [entry, setEntry] = useState<IntersectionObserverEntry>();
 
   const frozen = entry?.isIntersecting && freezeOnceVisible;
 
-  const updateEntry = ([entry]) => {
+  const updateEntry = ([entry]: IntersectionObserverEntry[]) => {
     setEntry(entry);
   };
 
@@ -26,13 +38,7 @@ export function useIntersectionObserver(
     return () => observer.disconnect();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    elementRef?.current,
-    JSON.stringify(threshold),
-    root,
-    rootMargin,
-    frozen,
-  ]);
+  }, [elementRef, threshold, root, rootMargin, frozen]);
 
   return entry;
 }

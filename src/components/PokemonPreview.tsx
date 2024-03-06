@@ -2,20 +2,48 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { colorByType } from "../constants/pokemon";
 
-const PokemonPreview = ({ pokemonURL, onClick }) => {
-  const [pokemon, setPokemon] = useState(null);
+interface PokemonType {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+interface Pokemon {
+  id: number;
+  name: string;
+  sprites: {
+    versions: {
+      "generation-v": {
+        "black-white": {
+          front_default: string;
+        };
+      };
+    };
+  };
+  types: PokemonType[];
+}
+
+interface Props {
+  pokemonURL: string;
+  onClick: (pokemon: Pokemon | null) => void;
+}
+
+const PokemonPreview: React.FC<Props> = ({ pokemonURL, onClick }) => {
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
   useEffect(() => {
     axios
-      .get(pokemonURL)
+      .get<Pokemon>(pokemonURL)
       .then(({ data }) => setPokemon(data))
       .catch((err) => console.log(err));
-  }, []);
+  }, [pokemonURL]);
 
   return (
     <article
       onClick={() => onClick(pokemon)}
-      className="group grid gap-2 cursor-pointer hover:border-slate-200 border-transparent  shadow-state-400/10 border-2 border-state-200 shadow-lg text-center bg-white rounded-[30px] relative font-semibold capitalize pb-2 pb-4"
+      className="group grid gap-2 cursor-pointer hover:border-slate-200 border-transparent shadow-state-400/10 border-2 border-state-200 shadow-lg text-center bg-white rounded-[30px] relative font-semibold capitalize pb-2 pb-4"
     >
       <header className="h-9">
         <img
@@ -44,4 +72,5 @@ const PokemonPreview = ({ pokemonURL, onClick }) => {
     </article>
   );
 };
+
 export default PokemonPreview;

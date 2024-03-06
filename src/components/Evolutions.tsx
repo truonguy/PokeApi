@@ -1,6 +1,16 @@
 import React from "react";
 
-const Evolutions = ({ evolutions }) => {
+interface Evolution {
+  name: string;
+  min_level: number;
+  image: string;
+}
+
+interface Props {
+  evolutions: Evolution[];
+}
+
+const Evolutions: React.FC<Props> = ({ evolutions }) => {
   return (
     <div className="flex justify-center gap-2 items-center flex-wrap">
       {evolutions.map((evolution, index) => (

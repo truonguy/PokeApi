@@ -1,9 +1,26 @@
-import { IconX } from "@tabler/icons-react";
 import React from "react";
+import { IconX } from "@tabler/icons-react";
 import { colorByType } from "../constants/pokemon";
 import Evolutions from "./Evolutions";
 
-const colorByStat = {
+interface Pokemon {
+  id: number;
+  name: string;
+  image: string;
+  types: string[];
+  description: string;
+  abilities: string[];
+  stats: { name: string; base_stat: number }[];
+  evolutions: { name: string; min_level: number; image: string }[];
+}
+
+interface Props {
+  showModal: boolean;
+  onCloseModal: () => void;
+  pokemon: Pokemon | null;
+}
+
+const colorByStat: Record<string, string> = {
   HP: "[&>div]:bg-red-500 bg-slate-100",
   ATK: "[&>div]:bg-orange-500 bg-slate-100",
   DEF: "[&>div]:bg-yellow-500 bg-slate-100",
@@ -13,13 +30,17 @@ const colorByStat = {
   TOT: "[&>div]:bg-blue-500 bg-blue-300",
 };
 
-const ModalPokemon = ({ showModal, onCloseModal, pokemon }) => {
+const ModalPokemon: React.FC<Props> = ({
+  showModal,
+  onCloseModal,
+  pokemon,
+}) => {
   return (
     <section
       className={`fixed top-0 left-0 right-0 h-screen transition-all
       duration-500
       ${showModal ? "visible opacity-100" : "invisible opacity-0"} 
-      ${colorByType[pokemon?.types[0]]} `}
+      ${colorByType[pokemon?.types[0] ?? ""]}`}
     >
       <button
         onClick={onCloseModal}

@@ -1,4 +1,8 @@
-const colorByType = {
+interface ColorByType {
+  [key: string]: string;
+}
+
+const colorByType: ColorByType = {
   normal: "bg-[#BCBCAC]",
   fighting: "bg-[#BC5442]",
   flying: "bg-[#669AFF]",

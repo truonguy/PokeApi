@@ -1,6 +1,12 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
-const getEvolutionsData = (evolutions) => {
+interface Evolution {
+  name: string;
+}
+
+const getEvolutionsData = (
+  evolutions: Evolution[]
+): Promise<AxiosResponse<any>>[] => {
   return evolutions.map(
     async (evolution) =>
       await axios.get(`https://pokeapi.co/api/v2/pokemon/${evolution.name}`)

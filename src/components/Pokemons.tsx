@@ -1,47 +1,48 @@
 import { IconSearch } from "@tabler/icons-react";
 import axios from "axios";
-import { useRef, useState } from "react";
-import { useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import PokemonList from "./PokemonList";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+
+interface Pokemon {
+  name: string;
+}
 
 const INITIAL_LIMIT = 40;
 const INCREASE_LIMIT = 20;
 
-const Pokemons = () => {
-  const [allPokemons, setAllPokemons] = useState([]);
-  const [pokemonName, setPokemonName] = useState("");
-  const [limit, setLimit] = useState(INITIAL_LIMIT);
+const Pokemons: React.FC = () => {
+  const [allPokemons, setAllPokemons] = useState<Pokemon[]>([]);
+  const [pokemonName, setPokemonName] = useState<string>("");
+  const [limit, setLimit] = useState<number>(INITIAL_LIMIT);
 
-  const targetObserver = useRef(null);
+  const targetObserver = useRef<HTMLSpanElement>(null);
   const entry = useIntersectionObserver(targetObserver, {});
   const isVisible = !!entry?.isIntersecting;
 
-  console.log(isVisible);
-
-  const pokemonsByName = allPokemons.filter((pokemon: { name: string }) =>
+  const pokemonsByName = allPokemons.filter((pokemon) =>
     pokemon.name.includes(pokemonName)
   );
 
-  const handleChangePokemonName = (e: string) =>
-    setPokemonName(e.toLowerCase());
+  const handleChangePokemonName = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setPokemonName(e.target.value.toLowerCase());
 
   useEffect(() => {
     axios
-      .get("https://pokeapi.co/api/v2/pokemon?limit=898")
+      .get<{ results: Pokemon[] }>(
+        "https://pokeapi.co/api/v2/pokemon?limit=898"
+      )
       .then(({ data }) => setAllPokemons(data.results))
       .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
     const maxPokemons = pokemonsByName.length;
-    if (isVisible && maxPokemons != 0) {
-      const maxPokemons = pokemonsByName.length;
+    if (isVisible && maxPokemons !== 0) {
       const newLimit = limit + INCREASE_LIMIT;
       newLimit > maxPokemons ? setLimit(maxPokemons) : setLimit(newLimit);
-      setLimit(newLimit);
     }
-  }, [isVisible]);
+  }, [isVisible, pokemonsByName.length]);
 
   useEffect(() => {
     setLimit(INITIAL_LIMIT);
@@ -57,9 +58,7 @@ const Pokemons = () => {
             autoComplete="off"
             placeholder="Search your Pokemon"
             name="pokemonName"
-            onChange={(e) => {
-              e && handleChangePokemonName(e.target.value.toString());
-            }}
+            onChange={handleChangePokemonName}
           />
           <button
             type="button"
@@ -77,8 +76,3 @@ const Pokemons = () => {
   );
 };
 export default Pokemons;
-
-// const handleSubmit = (e) => {
-//   e.preventDefault();
-//   setPokemonName(e.target.pokemonName.value.toLowerCase());
-// };
